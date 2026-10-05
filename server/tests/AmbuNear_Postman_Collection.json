@@ -1,0 +1,239 @@
+{
+  "info": {
+    "name": "AmbuNear Emergency Platform API Collection",
+    "description": "Comprehensive Postman test collection for the AmbuNear Ambulance Booking and Coordination MVP.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api", "type": "string" },
+    { "key": "authToken", "value": "", "type": "string" },
+    { "key": "driverToken", "value": "", "type": "string" },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "ambulanceId", "value": "", "type": "string" },
+    { "key": "bookingId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+      }
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Patient User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@ambunear.com\",\n  \"phone\": \"+91 99887-11223\",\n  \"password\": \"SecurePass@123\",\n  \"role\": \"PATIENT\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient@ambunear.com\",\n  \"password\": \"DemoPassword@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Ambulances",
+      "item": [
+        {
+          "name": "Get Nearby Available Ambulances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ambulances/nearby?latitude=28.62&longitude=77.21&radiusKm=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["ambulances", "nearby"],
+              "query": [
+                { "key": "latitude", "value": "28.62" },
+                { "key": "longitude", "value": "77.21" },
+                { "key": "radiusKm", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List All Ambulances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/ambulances", "host": ["{{baseUrl}}"], "path": ["ambulances"] }
+          }
+        },
+        {
+          "name": "Get Ambulance Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/ambulances/{{ambulanceId}}", "host": ["{{baseUrl}}"], "path": ["ambulances", "{{ambulanceId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Bookings",
+      "item": [
+        {
+          "name": "Create Ambulance Booking Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ambulanceId\": \"{{ambulanceId}}\",\n  \"pickupAddress\": \"Plot 14, Ring Road, Pilot District\",\n  \"pickupLatitude\": 28.618,\n  \"pickupLongitude\": 77.212,\n  \"destinationAddress\": \"Apex Multi-Speciality Hospital\",\n  \"destinationLatitude\": 28.635,\n  \"destinationLongitude\": 77.225,\n  \"patientName\": \"Ramesh Gupta\",\n  \"patientPhone\": \"+91 98777-66554\",\n  \"emergencyNotes\": \"Severe shortness of breath\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bookings", "host": ["{{baseUrl}}"], "path": ["bookings"] }
+          }
+        },
+        {
+          "name": "Get User Bookings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/bookings", "host": ["{{baseUrl}}"], "path": ["bookings"] }
+          }
+        },
+        {
+          "name": "Get Single Booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}"] }
+          }
+        },
+        {
+          "name": "Driver Accept Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{driverToken}}" }],
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/accept", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "accept"] }
+          }
+        },
+        {
+          "name": "Update Trip Status (ON_THE_WAY)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driverToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ON_THE_WAY\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/status", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "status"] }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cancellationReason\": \"Arranged alternate private transport\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bookings/{{bookingId}}/cancel", "host": ["{{baseUrl}}"], "path": ["bookings", "{{bookingId}}", "cancel"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Driver Portal",
+      "item": [
+        {
+          "name": "Get Driver Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{driverToken}}" }],
+            "url": { "raw": "{{baseUrl}}/driver/dashboard", "host": ["{{baseUrl}}"], "path": ["driver", "dashboard"] }
+          }
+        },
+        {
+          "name": "Update Driver Availability",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driverToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isAvailable\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/driver/availability", "host": ["{{baseUrl}}"], "path": ["driver", "availability"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Portal",
+      "item": [
+        {
+          "name": "Get Admin Metrics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/metrics", "host": ["{{baseUrl}}"], "path": ["admin", "metrics"] }
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/users", "host": ["{{baseUrl}}"], "path": ["admin", "users"] }
+          }
+        },
+        {
+          "name": "List Drivers for Verification",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/drivers", "host": ["{{baseUrl}}"], "path": ["admin", "drivers"] }
+          }
+        },
+        {
+          "name": "List All Fleet Ambulances",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/ambulances", "host": ["{{baseUrl}}"], "path": ["admin", "ambulances"] }
+          }
+        }
+      ]
+    }
+  ]
+}
